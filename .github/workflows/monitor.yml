@@ -15,13 +15,13 @@ concurrency:
 jobs:
   check:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 8
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - run: npm install playwright@1 && npx playwright install --with-deps chromium
+      - run: npm install --no-save playwright-core@1
       - run: node monitor.mjs
         env:
           NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}

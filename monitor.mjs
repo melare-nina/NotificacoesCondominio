@@ -1,6 +1,6 @@
 // Monitora o status da portaria e envia notificação push (ntfy) para o iPhone
 // quando o status muda para "entregando encomendas".
-import { chromium } from "playwright";
+import { chromium } from "playwright-core";
 import fs from "node:fs";
 
 const URL = process.env.PORTAL_URL || "https://portalprimavera.online/";
@@ -13,7 +13,7 @@ if (!TOPIC) {
   process.exit(1);
 }
 
-const browser = await chromium.launch();
+const browser = await chromium.launch({ channel: "chrome" }); // usa o Chrome que já vem no GitHub
 const page = await browser.newPage();
 await page.goto(URL, { waitUntil: "networkidle", timeout: 60000 });
 // Espera até 45s o status aparecer ("O porteiro está ...")

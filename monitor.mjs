@@ -41,16 +41,20 @@ console.log("Trecho da página:", texto.slice(0, 300));
 
 // Só notifica quando MUDA para "entregando" (evita notificação repetida)
 if (entregando && anterior !== "entregando") {
-  await fetch(`https://ntfy.sh/${TOPIC}`, {
+  // Envio em JSON (aceita acentos e emoji no título)
+  const resp = await fetch("https://ntfy.sh/", {
     method: "POST",
-    headers: {
-      Title: "Portaria: entregando encomendas 📦",
-      Priority: "high",
-      Tags: "package",
-      Click: URL,
-    },
-    body: "O porteiro está entregando encomendas agora.",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      topic: TOPIC,
+      title: "Portaria: entregando encomendas 📦",
+      message: "O porteiro está entregando encomendas agora.",
+      priority: 4,
+      tags: ["package"],
+      click: URL,
+    }),
   });
+  if (!resp.ok) throw new Error(`ntfy respondeu ${resp.status}: ${await resp.text()}`);
   console.log("Notificação enviada.");
 }
 

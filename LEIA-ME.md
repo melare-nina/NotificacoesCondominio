@@ -23,7 +23,9 @@ Nada roda no celular, então não gasta bateria.
    No log aparece o "Trecho da página", que mostra se o robô está lendo o status.
 
 ## Ajustes
-- **Intervalo:** no `monitor.yml`, troque `*/10` por `*/20` para checar a cada 20 minutos.
+- **Intervalo:** no `monitor.yml`, troque `sleep 600` por `sleep 1200` para checar a cada 20 minutos.
+- **Pausar:** em Actions → Monitor da portaria → `...` → **Disable workflow**. Para religar, **Enable workflow** e **Run workflow**.
+- O repositório precisa ser **público** (minutos ilimitados no GitHub). O nome do tópico continua secreto.
 - **Página:** por padrão o robô lê `/publico`. Se o status aparecer só em `/status-live`, troque a URL no topo do `monitor.mjs`.
 - **Outros status:** a regra está na linha `ALVO`. Exemplo: `/pausa|ronda/i`.
-- O GitHub pausa agendamentos de repositórios sem atividade por 60 dias. Se as notificações pararem, entre na aba Actions e reative.
+- Se as notificações pararem, veja a aba Actions: deve haver sempre uma rodada em andamento.

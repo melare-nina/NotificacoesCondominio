@@ -3,7 +3,7 @@
 import { chromium } from "playwright";
 import fs from "node:fs";
 
-const URL = process.env.PORTAL_URL || "https://portalprimavera.online/publico";
+const URL = process.env.PORTAL_URL || "https://portalprimavera.online/";
 const TOPIC = process.env.NTFY_TOPIC; // ex.: portaria-primavera-x7k29q (segredo no GitHub)
 const STATE_FILE = "last_status.txt";
 const ALVO = /entregando\s+encomenda/i;
@@ -16,11 +16,23 @@ if (!TOPIC) {
 const browser = await chromium.launch();
 const page = await browser.newPage();
 await page.goto(URL, { waitUntil: "networkidle", timeout: 60000 });
-await page.waitForTimeout(5000); // dá tempo do site carregar o status
+// Espera até 45s o status aparecer ("O porteiro está ...")
+try {
+  await page.waitForFunction(() => /porteiro est[aá]/i.test(document.body.innerText), null, { timeout: 45000 });
+} catch {}
+await page.waitForTimeout(2000);
 const texto = (await page.innerText("body")).replace(/\s+/g, " ");
 await browser.close();
 
-const entregando = ALVO.test(texto);
+const statusLido = (texto.match(/O porteiro est[aá] ([^.]+?)(?= Porteiro:|$)/i) || [])[1];
+if (!statusLido) {
+  console.log("Status não encontrado na página; mantendo o último status salvo.");
+  console.log("Trecho da página:", texto.slice(0, 300));
+  process.exit(0);
+}
+console.log("Status lido:", statusLido);
+
+const entregando = ALVO.test(statusLido);
 const atual = entregando ? "entregando" : "outro";
 const anterior = fs.existsSync(STATE_FILE) ? fs.readFileSync(STATE_FILE, "utf8").trim() : "";
 
